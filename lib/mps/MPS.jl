@@ -27,6 +27,8 @@ include("linalg.jl")
 # decompositions
 include("decomposition.jl")
 
+include("solve.jl")
+
 # matrix copy
 include("copy.jl")
 

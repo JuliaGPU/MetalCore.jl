@@ -213,4 +213,39 @@ end
     @test_throws SingularException lu(A)
 end
 
+@testset "solves" begin
+    b = MtlVector(rand(Float32, 1024))
+    B = MtlMatrix(rand(Float32, 1024, 1024))
+
+    A = MtlMatrix(rand(Float32, 1024, 512))
+    x = lu(A) \ b
+    @test A * x ≈ b
+    X = lu(A) \ B
+    @test A * X ≈ B
+
+    A = UpperTriangular(MtlMatrix(rand(Float32, 1024, 1024)))
+    x = A \ b
+    @test A * x ≈ b
+    X = A \ B
+    @test A * X ≈ B
+
+    A = UnitUpperTriangular(MtlMatrix(rand(Float32, 1024, 1024)))
+    x = A \ b
+    @test A * x ≈ b
+    X = A \ B
+    @test A * X ≈ B
+
+    A = LowerTriangular(MtlMatrix(rand(Float32, 1024, 1024)))
+    x = A \ b
+    @test A * x ≈ b
+    X = A \ B
+    @test A * X ≈ B
+
+    A = UnitLowerTriangular(MtlMatrix(rand(Float32, 1024, 1024)))
+    x = A \ b
+    @test A * x ≈ b
+    X = A \ B
+    @test A * X ≈ B
+end
+
 end
