@@ -161,6 +161,7 @@ mtlconvert(arg, cce=nothing) = adapt(Adaptor(cce), arg)
 struct HostKernel{F,TT}
     f::F
     pipeline::MTLComputePipelineState
+    loggingEnabled::Bool
 end
 
 const mtlfunction_lock = ReentrantLock()
@@ -186,7 +187,7 @@ function mtlfunction(f::F, tt::TT=Tuple{}; name=nothing, kwargs...) where {F,TT}
         cache = compiler_cache(dev)
         source = methodinstance(F, tt)
         config = compiler_config(dev; name, kwargs...)::MetalCompilerConfig
-        pipeline = GPUCompiler.cached_compilation(cache, source, config, compile, link)
+        pipeline, loggingEnabled = GPUCompiler.cached_compilation(cache, source, config, compile, link)
 
         # create a callable object that captures the function instance. we don't need to think
         # about world age here, as GPUCompiler already does and will return a different object
@@ -194,7 +195,7 @@ function mtlfunction(f::F, tt::TT=Tuple{}; name=nothing, kwargs...) where {F,TT}
         kernel = get(_kernel_instances, h, nothing)
         if kernel === nothing
             # create the kernel state object
-            kernel = HostKernel{F,tt}(f, pipeline)
+            kernel = HostKernel{F,tt}(f, pipeline, loggingEnabled)
             _kernel_instances[h] = kernel
         end
         return kernel::HostKernel{F,tt}
@@ -275,7 +276,34 @@ end
     (threads.width * threads.height * threads.depth) > kernel.pipeline.maxTotalThreadsPerThreadgroup &&
         throw(ArgumentError("Number of threads in group ($(threads.width * threads.height * threads.depth)) should not exceed $(kernel.pipeline.maxTotalThreadsPerThreadgroup)"))
 
-    cmdbuf = MTLCommandBuffer(queue)
+    cmdbuf = if kernel.loggingEnabled
+        if macos_version() < v"15"
+            @error "Logging is only supported on macOS 15 or higher"
+        end
+
+        if MTLCaptureManager().isCapturing
+            @error "Logging is not supported while GPU frame capturing"
+        end
+
+        log_state_descriptor = MTLLogStateDescriptor()
+        log_state_descriptor.level = MTL.MTLLogLevelDebug
+        log_state = MTLLogState(queue.device, log_state_descriptor)
+
+        function log_handler(subSystem, category, logLevel, message)
+            print(String(NSString(message)))
+            return nothing
+        end
+
+        block = @objcblock(log_handler, Nothing, (id{NSString}, id{NSString}, NSInteger, id{NSString}))
+        @objc [log_state::id{MTLLogState} addLogHandler:block::id{NSBlock}]::Nothing
+
+        cmdbuf_descriptor = MTLCommandBufferDescriptor()
+        cmdbuf_descriptor.logState = log_state
+        MTLCommandBuffer(queue, cmdbuf_descriptor)
+    else
+        MTLCommandBuffer(queue)
+    end
+
     cmdbuf.label = "MTLCommandBuffer($(nameof(kernel.f)))"
     cce = MTLComputeCommandEncoder(cmdbuf)
     argument_buffers = try

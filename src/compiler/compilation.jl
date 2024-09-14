@@ -104,9 +104,9 @@ function compile(@nospecialize(job::CompilerJob))
 
     @signpost_interval log=log_compiler() "Generate LLVM IR" begin
         # TODO: on 1.9, this actually creates a context. cache those.
-        ir, entry = JuliaContext() do ctx
+        ir, entry, loggingEnabled = JuliaContext() do ctx
             mod, meta = GPUCompiler.compile(:llvm, job)
-            string(mod), LLVM.name(meta.entry)
+            string(mod), LLVM.name(meta.entry), haskey(functions(mod), "air.os_log")
         end
     end
 
@@ -172,7 +172,7 @@ function compile(@nospecialize(job::CompilerJob))
         end
     end
 
-    return (; ir, air, metallib, entry)
+    return (; ir, air, metallib, entry, loggingEnabled)
 end
 
 # link into an executable kernel
@@ -210,5 +210,7 @@ end
         end
     end
 
-    pipeline_state
+    # most of the time, we don't need the function object,
+    # so don't keep it alive unconditionally in GPUCompiler's caches
+    pipeline_state, compiled.loggingEnabled
 end

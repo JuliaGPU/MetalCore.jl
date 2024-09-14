@@ -34,6 +34,7 @@ include("device/intrinsics/memory.jl")
 include("device/intrinsics/simd.jl")
 include("device/intrinsics/version.jl")
 include("device/intrinsics/atomics.jl")
+include("device/intrinsics/output.jl")
 include("device/quirks.jl")
 
 # array essentials

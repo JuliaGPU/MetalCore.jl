@@ -1,10 +1,3 @@
-macro print_and_throw(args...)
-    quote
-        #@println "ERROR: " $(args...) "."
-        throw(nothing)
-    end
-end
-
 # math.jl
 @device_override @noinline Base.Math.throw_complex_domainerror(f::Symbol, x) =
     @print_and_throw "This operation requires a complex input to return a complex result"

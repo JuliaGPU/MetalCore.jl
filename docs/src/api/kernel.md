@@ -54,3 +54,12 @@ MemoryFlags
 threadgroup_barrier
 simdgroup_barrier
 ```
+
+## Printing
+
+```@docs
+@mtlprintf
+@mtlprint
+@mtlprintln
+@mtlshow
+```
