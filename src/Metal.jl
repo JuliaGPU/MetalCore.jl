@@ -10,6 +10,7 @@ using Preferences: @load_preference, load_preference
 using ExprTools: splitdef, combinedef
 using ObjectiveC, .CoreFoundation, .Foundation, .Dispatch, .OS
 import KernelAbstractions
+using BFloat16s
 
 include("version.jl")
 
