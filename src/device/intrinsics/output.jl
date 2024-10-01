@@ -48,11 +48,7 @@ macro mtlprintf(fmt::String, args...)
     fmt_val = Val(Symbol(fmt))
 
     quote
-        if metal_version() < sv"3.2"
-            @print_and_throw "@mtlprintf requires Metal 3.2 (macOS 15) or higher"
-        else
-            _mtlprintf($fmt_val, $(map(arg -> :(promote_c_argument($arg)), esc.(args))...))
-        end
+        _mtlprintf($fmt_val, $(map(arg -> :(promote_c_argument($arg)), esc.(args))...))
     end
 end
 
