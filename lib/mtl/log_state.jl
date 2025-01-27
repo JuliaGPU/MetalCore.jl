@@ -1,14 +1,5 @@
 export MTLLogLevel
 
-@cenum MTLLogLevel::NSInteger begin
-    MTLLogLevelUndefined = 0
-    MTLLogLevelDebug = 1
-    MTLLogLevelInfo = 2
-    MTLLogLevelNotice = 3
-    MTLLogLevelError = 4
-    MTLLogLevelFault = 5
-end
-
 export MTLLogStateDescriptor
 
 @objcwrapper immutable=false MTLLogStateDescriptor <: NSObject
