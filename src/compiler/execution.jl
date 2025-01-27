@@ -291,7 +291,7 @@ end
         log_state = MTLLogState(queue.device, log_state_descriptor)
 
         function log_handler(subSystem, category, logLevel, message)
-            print(String(NSString(message)))
+            Core.println(String(NSString(message)))
             return nothing
         end
 
