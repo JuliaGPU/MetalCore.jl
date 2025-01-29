@@ -159,8 +159,6 @@ MATH_INTR_FUNCS_2_ARG = [
     # frexp, # T frexp(T x, Ti &exponent)
     # ldexp, # T ldexp(T x, Ti k)
     # modf, # T modf(T x, T &intval)
-    # nextafter, # T nextafter(T x, T y) # Metal 3.1+
-    # sincos,
     hypot, # NOT MSL but tested the same
 ]
 
@@ -357,6 +355,25 @@ end
         buffer = MtlArray(arr)
         vec = Array(expm1.(buffer))
         @test vec ≈ expm1.(arr)
+    end
+
+
+    let # nextafter
+        if Metal.is_macos(v"14")
+            N = 4
+            function nextafter_test(X, y)
+                idx = thread_position_in_grid_1d()
+                X[idx] = Metal.nextafter(X[idx], y)
+                return nothing
+            end
+            arr = rand(T, N)
+            buffer = MtlArray(arr)
+            Metal.@sync @metal threads = N nextafter_test(buffer, typemax(T))
+            @test Array(buffer) == nextfloat.(arr)
+
+            Metal.@sync @metal threads = N nextafter_test(buffer, typemin(T))
+            @test Array(buffer) == arr
+        end
     end
 end
 end

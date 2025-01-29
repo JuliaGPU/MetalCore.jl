@@ -295,6 +295,11 @@ end
 @device_override Base.trunc(x::Float32) = ccall("extern air.trunc.f32", llvmcall, Cfloat, (Cfloat,), x)
 @device_override Base.trunc(x::Float16) = ccall("extern air.trunc.f16", llvmcall, Float16, (Float16,), x)
 
+@static if Metal.is_macos(v"14")
+    @device_function nextafter(x::Float32, y::Float32) = ccall("extern air.nextafter.f32", llvmcall, Cfloat, (Cfloat, Cfloat), x, y)
+    @device_function nextafter(x::Float16, y::Float16) = ccall("extern air.nextafter.f16", llvmcall, Float16, (Float16, Float16), x, y)
+end
+
 # hypot without use of double
 #
 # taken from Cosmopolitan Libc
