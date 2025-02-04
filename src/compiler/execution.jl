@@ -278,7 +278,7 @@ end
 
     cmdbuf = if kernel.loggingEnabled
         # TODO: make this a dynamic error, i.e., from the kernel (JuliaGPU/Metal.jl#433)
-        @static if macos_version() < v"15"
+        @static if !is_macos(v"15.0.0")
             error("Logging is only supported on macOS 15 or higher")
         end
 

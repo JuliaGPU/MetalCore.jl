@@ -1,25 +1,27 @@
-export MTLLogLevel
+@static if Metal.is_macos(v"15.0.0")
+    export MTLLogLevel
 
-export MTLLogStateDescriptor
+    export MTLLogStateDescriptor
 
-# @objcwrapper immutable = true MTLLogStateDescriptor <: NSObject
+    # @objcwrapper immutable = true MTLLogStateDescriptor <: NSObject
 
-function MTLLogStateDescriptor()
-    handle = @objc [MTLLogStateDescriptor alloc]::id{MTLLogStateDescriptor}
-    obj = MTLLogStateDescriptor(handle)
-    @objc [obj::id{MTLLogStateDescriptor} init]::id{MTLLogStateDescriptor}
-    return obj
-end
+    function MTLLogStateDescriptor()
+        handle = @objc [MTLLogStateDescriptor alloc]::id{MTLLogStateDescriptor}
+        obj = MTLLogStateDescriptor(handle)
+        @objc [obj::id{MTLLogStateDescriptor} init]::id{MTLLogStateDescriptor}
+        return obj
+    end
 
 
-export MTLLogState
+    export MTLLogState
 
-# @objcwrapper immutable = true MTLLogState <: NSObject
+    # @objcwrapper immutable = true MTLLogState <: NSObject
 
-function MTLLogState(dev::MTLDevice, descriptor::MTLLogStateDescriptor)
-    err = Ref{id{NSError}}(nil)
-    handle = @objc [dev::id{MTLDevice} newLogStateWithDescriptor:descriptor::id{MTLLogStateDescriptor}
-                                       error:err::Ptr{id{NSError}}]::id{MTLLogState}
-    err[] == nil || throw(NSError(err[]))
-    MTLLogState(handle)
+    function MTLLogState(dev::MTLDevice, descriptor::MTLLogStateDescriptor)
+        err = Ref{id{NSError}}(nil)
+        handle = @objc [dev::id{MTLDevice} newLogStateWithDescriptor:descriptor::id{MTLLogStateDescriptor}
+            error:err::Ptr{id{NSError}}]::id{MTLLogState}
+        err[] == nil || throw(NSError(err[]))
+        MTLLogState(handle)
+    end
 end
