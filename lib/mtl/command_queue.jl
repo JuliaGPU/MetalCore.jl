@@ -1,11 +1,6 @@
 export MTLCommandQueueDescriptor
 
-@objcwrapper immutable=false MTLCommandQueueDescriptor <: NSObject
-
-@objcproperties MTLCommandQueueDescriptor begin
-    @autoproperty maxCommandBufferCount::NSUInteger
-    @autoproperty logState::id{MTLLogState} setter=setLogState
-end
+# @objcwrapper immutable=false MTLCommandQueueDescriptor <: NSObject
 
 function MTLCommandQueueDescriptor()
     handle = @objc [MTLCommandQueueDescriptor alloc]::id{MTLCommandQueueDescriptor}
