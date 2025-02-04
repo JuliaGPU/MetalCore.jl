@@ -1,6 +1,6 @@
 @testset "output" begin
 
-if Metal.macos_version() < v"15"
+@static if Metal.macos_version() < v"15"
 
 @warn "Skipping output tests in macOS 14 and below"
 
