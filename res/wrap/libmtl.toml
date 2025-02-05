@@ -1,7 +1,6 @@
 [general]
 library_name = "Symbol(\"/System/Library/Frameworks/Metal.framework/Resources/BridgeSupport/Metal.dylib\")"
 output_file_path = "../../lib/mtl/libmtl.jl"
-prologue_file_path = "libmtl_prologue.jl"
 
 minimum_macos_supported = "13"
 
@@ -22,8 +21,6 @@ printer_blacklist = [
 use_ccall_macro = true
 always_NUL_terminated_string = true
 opaque_as_mutable_struct = true
-
-version_function = "Metal.is_macos"
 
 [codegen.macro]
 # it's highly recommended to set this entry to "basic".

@@ -35,8 +35,6 @@ use_ccall_macro = true
 always_NUL_terminated_string = true
 opaque_as_mutable_struct = true
 
-version_function = "Metal.is_macos"
-
 [codegen.macro]
 # it's highly recommended to set this entry to "basic".
 # if you'd like to skip all of the macros, please set this entry to "disable".

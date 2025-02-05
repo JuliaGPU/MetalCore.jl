@@ -384,9 +384,7 @@ end
 @objcproperties MPSNDArrayDescriptor begin
     @autoproperty dataType::MPSDataType setter = setDataType
     @autoproperty numberOfDimensions::UInt64 setter = setNumberOfDimensions
-    @static if Metal.is_macos(v"15.0.0")
-        @autoproperty preferPackedRows::Bool setter = setPreferPackedRows
-    end
+    @autoproperty preferPackedRows::Bool setter = setPreferPackedRows availability = macos(v"15.0.0")
 end
 
 @objcwrapper immutable = true MPSNDArrayAllocator <: NSObject
@@ -2541,9 +2539,7 @@ end
 
 @objcwrapper immutable = true MPSNDArrayGatherGradient <: MPSNDArrayBinaryPrimaryGradientKernel
 
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayIdentity <: MPSNDArrayUnaryKernel
-end
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayIdentity <: MPSNDArrayUnaryKernel
 
 @cenum MPSNDArrayQuantizationScheme::UInt64 begin
     MPSNDArrayQuantizationTypeNone = 0x0000000000000000
@@ -2551,45 +2547,34 @@ end
     MPSNDArrayQuantizationTypeLUT = 0x0000000000000002
 end
 
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayQuantizationDescriptor <: NSObject
-    @objcproperties MPSNDArrayQuantizationDescriptor begin
-        @autoproperty quantizationDataType::MPSDataType
-        @autoproperty quantizationScheme::MPSNDArrayQuantizationScheme
-    end
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayQuantizationDescriptor <: NSObject
+
+@objcproperties MPSNDArrayQuantizationDescriptor begin
+    @autoproperty quantizationDataType::MPSDataType
+    @autoproperty quantizationScheme::MPSNDArrayQuantizationScheme
 end
 
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayAffineQuantizationDescriptor <: MPSNDArrayQuantizationDescriptor
-    @objcproperties MPSNDArrayAffineQuantizationDescriptor begin
-        @autoproperty hasZeroPoint::Bool setter = setHasZeroPoint
-        @autoproperty hasMinValue::Bool setter = setHasMinValue
-        @autoproperty implicitZeroPoint::Bool setter = setImplicitZeroPoint
-    end
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayAffineQuantizationDescriptor <: MPSNDArrayQuantizationDescriptor
+
+@objcproperties MPSNDArrayAffineQuantizationDescriptor begin
+    @autoproperty hasZeroPoint::Bool setter = setHasZeroPoint
+    @autoproperty hasMinValue::Bool setter = setHasMinValue
+    @autoproperty implicitZeroPoint::Bool setter = setImplicitZeroPoint
 end
 
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayLUTQuantizationDescriptor <: MPSNDArrayQuantizationDescriptor
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayLUTQuantizationDescriptor <: MPSNDArrayQuantizationDescriptor
+
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayQuantizedMatrixMultiplication <: MPSNDArrayMatrixMultiplication
+
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayLUTDequantize <: MPSNDArrayMultiaryKernel
+
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayVectorLUTDequantize <: MPSNDArrayMultiaryKernel
+
+@objcproperties MPSNDArrayVectorLUTDequantize begin
+    @autoproperty vectorAxis::UInt64 setter = setVectorAxis
 end
 
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayQuantizedMatrixMultiplication <: MPSNDArrayMatrixMultiplication
-end
-
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayLUTDequantize <: MPSNDArrayMultiaryKernel
-end
-
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayVectorLUTDequantize <: MPSNDArrayMultiaryKernel
-    @objcproperties MPSNDArrayVectorLUTDequantize begin
-        @autoproperty vectorAxis::UInt64 setter = setVectorAxis
-    end
-end
-
-@static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MPSNDArrayAffineInt4Dequantize <: MPSNDArrayMultiaryKernel
-end
+@objcwrapper immutable = true availability = macos(v"15.0.0") MPSNDArrayAffineInt4Dequantize <: MPSNDArrayMultiaryKernel
 
 struct _MPSPackedFloat3
     data::NTuple{12, UInt8}
