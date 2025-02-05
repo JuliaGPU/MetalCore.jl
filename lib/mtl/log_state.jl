@@ -3,11 +3,12 @@
 
     export MTLLogStateDescriptor
 
-    # @objcwrapper immutable = true MTLLogStateDescriptor <: NSObject
+    # @objcwrapper immutable = false MTLLogStateDescriptor <: NSObject
 
     function MTLLogStateDescriptor()
         handle = @objc [MTLLogStateDescriptor alloc]::id{MTLLogStateDescriptor}
         obj = MTLLogStateDescriptor(handle)
+        finalizer(release, obj)
         @objc [obj::id{MTLLogStateDescriptor} init]::id{MTLLogStateDescriptor}
         return obj
     end

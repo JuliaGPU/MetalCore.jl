@@ -1427,7 +1427,7 @@ end
 end
 
 @static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MTLCommandQueueDescriptor <: NSObject
+    @objcwrapper immutable = false MTLCommandQueueDescriptor <: NSObject
     @objcproperties MTLCommandQueueDescriptor begin
         @autoproperty maxCommandBufferCount::UInt64 setter = setMaxCommandBufferCount
         @autoproperty logState::id{MTLLogState} setter = setLogState
@@ -2759,7 +2759,7 @@ end
 end
 
 @static if Metal.is_macos(v"15.0.0")
-    @objcwrapper immutable = true MTLLogStateDescriptor <: NSObject
+    @objcwrapper immutable = false MTLLogStateDescriptor <: NSObject
     @objcproperties MTLLogStateDescriptor begin
         @autoproperty level::MTLLogLevel setter = setLevel
         @autoproperty bufferSize::Int64 setter = setBufferSize
