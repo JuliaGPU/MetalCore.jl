@@ -15,7 +15,7 @@ High-level interface for executing code on a GPU.
 The `@metal` macro should prefix a call, with `func` a callable function or object that
 should return nothing. It will be compiled to a Metal function upon first use, and to a
 certain extent arguments will be converted and managed automatically using `mtlconvert`.
-Finally, a call to `mtlcall` is performed, creating a command buffer in the current global
+Finally, the kernel will be called, creating a command buffer in the current global
 command queue then committing it.
 
 There is one supported keyword argument that influences the behavior of `@metal`:
@@ -275,12 +275,28 @@ end
     (threads.width * threads.height * threads.depth) > kernel.pipeline.maxTotalThreadsPerThreadgroup &&
         throw(ArgumentError("Number of threads in group ($(threads.width * threads.height * threads.depth)) should not exceed $(kernel.pipeline.maxTotalThreadsPerThreadgroup)"))
 
+
+    # TODO: cache kernel state as MTLBuffer to lower launch cost?
+    exception_info, exception_buffer = begin
+        ref = Ref{ExceptionInfo}()
+        sz = cld(sizeof(ExceptionInfo_st), MTL.PAGESIZE) * MTL.PAGESIZE
+        status = @ccall posix_memalign(ref::Ptr{ExceptionInfo},
+                                       MTL.PAGESIZE::Csize_t,
+                                       sz::Csize_t)::Cint
+        status == 0 || throw(OutOfMemoryError())
+        cpu = unsafe_wrap(Vector{ExceptionInfo_st}, ref[], sz; own=true)
+        gpu = MTLBuffer(device(), sz, ref[]; nocopy=true)
+        cpu, gpu
+    end
+    state = KernelState(exception_buffer.gpuAddress)
+    # XXX: adapt() informs the cce about r/w usage of this buffer
+
     cmdbuf = MTLCommandBuffer(queue)
     cmdbuf.label = "MTLCommandBuffer($(nameof(kernel.f)))"
     cce = MTLComputeCommandEncoder(cmdbuf)
     argument_buffers = try
         MTL.set_function!(cce, kernel.pipeline)
-        bufs = encode_arguments!(cce, kernel, kernel.f, args...)
+        bufs = encode_arguments!(cce, kernel, kernel.f, state, args...)
         MTL.append_current_function!(cce, groups, threads)
         bufs
     finally
