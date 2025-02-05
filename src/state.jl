@@ -47,6 +47,7 @@ function global_queue(dev::MTLDevice)
         @autoreleasepool begin
             # NOTE: MTLCommandQueue itself is manually reference-counted,
             #       the release pool is for resources used during its construction.
+
             queue = MTLCommandQueue(dev)
             queue.label = "global_queue($(current_task()))"
             global_queues[queue] = nothing

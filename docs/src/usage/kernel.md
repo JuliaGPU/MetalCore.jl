@@ -84,6 +84,34 @@ Additional notes:
 - Kernels must always return nothing
 - Kernels are asynchronous. To synchronize, use the `Metal.@sync` macro.
 
+## Printing
+
+When debugging, it's not uncommon to want to print some values. This is achieved with `@mtlprintf`:
+
+```julia
+function gpu_add2_print!(y, x)
+    index = thread_position_in_grid_1d()
+    @mtlprintf("thread %d", index)
+    @inbounds y[i] += x[i]
+    return nothing
+end
+
+A = Metal.ones(Float32, 8);
+B = Metal.rand(Float32, 8);
+
+@metal threads=length(A) gpu_add2_print!(A, B)
+```
+
+`@mtlprintf` is supported on macOS 15 and later. `@mtlprintf` support most of the format specifiers that `printf`
+supports in C with the following exceptions:
+ - `%n` and `%s` conversion specifiers are not supported
+ - Default argument promotion applies to arguments of half type which promote to the `double` type
+ - The format string must be a string literal
+
+Metal places output from `@mtlprintf` into a log buffer. The system only removes the messages from the log buffer when the command buffer completes. When the log buffer becomes full, the system drops all subsequent messages.
+
+See also: `@mtlprint`, `@mtlprintln` and `@mtlshow`
+
 ## Other Helpful Links
 
 [Metal Shading Language Specification](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf)

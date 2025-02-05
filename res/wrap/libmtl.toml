@@ -53,6 +53,9 @@ immutable=false
 [api.MTLCommandQueue]
 immutable=false
 
+[api.MTLCommandQueueDescriptor]
+immutable=false
+
 [api.MTLCompileOptions]
 immutable=false
     [api.MTLCompileOptions.proptype]
@@ -86,6 +89,9 @@ immutable=false
 immutable=false
 
 [api.MTLLibrary]
+immutable=false
+
+[api.MTLLogStateDescriptor]
 immutable=false
 
 [api.MTLSharedEvent]
