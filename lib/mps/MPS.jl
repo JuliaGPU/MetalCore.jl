@@ -16,6 +16,8 @@ using ObjectiveC, .Foundation
 
 import GPUArrays
 
+using BFloat16s
+
 const MtlFloat = Union{Float32, Float16}
 
 const MPSShape = NSArray#{NSNumber}
