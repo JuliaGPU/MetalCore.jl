@@ -18,7 +18,8 @@ function GPUCompiler.finish_ir!(@nospecialize(job::MetalCompilerJob),
     # pointer type information for typed intrinsics
     # (this is consumed by the LLVM IR downgrader)
     for (jltyp, llvmtyp) in (Int32 => :i32, Int64 => :i64,
-                             Float16 => :f16, Float32 => :f32),
+                             Float16 => :f16, Float32 => :f32,
+                             BFloat16 => :bf16),
         (as, asname) in (AS.Device => "global", AS.ThreadGroup => "local")
 
         # map of intrinsics to pointer operand indices and eltypes

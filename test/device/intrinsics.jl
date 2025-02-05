@@ -1,3 +1,4 @@
+using BFloat16s
 using Metal: metal_support
 using Random
 using SpecialFunctions
@@ -499,8 +500,9 @@ end
 ############################################################################################
 
 @testset "simd intrinsics" begin
-
-@testset "shuffle($typ)" for typ in [Float32, Float16, Int32, UInt32, Int16, UInt16, Int8, UInt8]
+types = [Float32, Float16, Int32, UInt32, Int16, UInt16, Int8, UInt8]
+metal_support() >= v"3.1" && push!(types, BFloat16)
+@testset "shuffle($typ)" for typ in types
     function kernel(a::MtlDeviceVector{T}, b::MtlDeviceVector{T}) where T
         idx = thread_position_in_grid_1d()
         idx_in_simd = thread_index_in_simdgroup()
@@ -535,7 +537,9 @@ end
 end
 
 @testset "matrix functions" begin
-    @testset "load_store($typ)" for typ in [Float16, Float32]
+    simdgroup_types = [Float16, Float32]
+    metal_support() >= v"3.1" && push!(simdgroup_types, BFloat16)
+    @testset "load_store($typ)" for typ in simdgroup_types
         function kernel(a::MtlDeviceArray{T}, b::MtlDeviceArray{T},
                             origin_a=(1, 1), origin_b=(1, 1)) where {T}
             sg_a = simdgroup_load(a, origin_a)
@@ -558,7 +562,7 @@ end
         end
     end
 
-    @testset "load_store_tg($typ)" for typ in [Float16, Float32]
+    @testset "load_store_tg($typ)" for typ in simdgroup_types
         function kernel(a::MtlDeviceArray{T}, b::MtlDeviceArray{T}) where {T}
             pos = thread_position_in_threadgroup_2d()
 
@@ -582,7 +586,7 @@ end
         @test Array(a) == Array(b)
     end
 
-    @testset "mul($typ)" for typ in [Float16, Float32]
+    @testset "mul($typ)" for typ in simdgroup_types
         function kernel(a::MtlDeviceArray{T}, b::MtlDeviceArray{T}, c::MtlDeviceArray{T}) where {T}
             sg_a = simdgroup_load(a)
             sg_b = simdgroup_load(b)
@@ -598,7 +602,7 @@ end
         @test Array(a) * Array(b) ≈ Array(c)
     end
 
-    @testset "mad($typ)" for typ in [Float16, Float32]
+    @testset "mad($typ)" for typ in simdgroup_types
         function kernel(a::MtlDeviceArray{T}, b::MtlDeviceArray{T}, c::MtlDeviceArray{T},
                     d::MtlDeviceArray{T}) where {T}
             sg_a = simdgroup_load(a)
